@@ -12,7 +12,6 @@ IBM ECHO is a API Requestor which refers to a component or entity within a softw
 - [x]  API Chaining - now run APIs sequentially with the ability to pass on real-time responses and other data to subsequent APIs in the chain. An excellent feature to perform integration tests, run dependent APIs and more!
 - [x]  Echo can be run on your favourite browser or on your personal computer as a desktop app.
 - [x]  Unlike other REST API clients in the market, Echo desktop app works just as great in offline mode, too!
-- [x]  Powered with the formidable watsonx assistant, Sahay, to answer all things ECHO and generate ready-to-run APIs!
 
 ## How it works
 - There are two parts to the application - Backend & Frontend.
@@ -55,6 +54,7 @@ App uses [ElectronJs](https://www.electronjs.org/) in order to package Vite+Reac
 - `cd server`
 - `yarn make`
 
+
 <!-- Questions can be useful but optional, this gives you a place to say, "This is how to contact this project maintainers or create PRs -->
 If you have any questions or issues you can create a new [issue here][issues].
 
@@ -82,9 +82,6 @@ If you would like to see the detailed LICENSE click [here](LICENSE).
 #
 ```
 ## Authors
-
-Optionally, you may include a list of authors, though this is redundant with the built-in
-GitHub list of contributors.
 
 - Author: Ashrith Shetty <ashrithshetty@in.ibm.com>
 - Author: Vaishnavi Sanjay Killekar <vaishnavi.killekar@ibm.com>
