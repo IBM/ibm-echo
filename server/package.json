@@ -1,0 +1,43 @@
+{
+	"name": "echo",
+	"version": "1.0.0",
+	"type": "commonjs",
+	"main": "index.cjs",
+	"author": "IBM ECHO",
+	"description": "IBM ECHO Rest API client",
+	"scripts": {
+		"electron-start-dev": "export IS_ELECTRON_BUILD=true && env-cmd -f ./.env electron .",
+		"electron-build": "yarn install && yarn build-client && export IS_ELECTRON_BUILD=true && env-cmd -f ./.env.prod npx electron-packager . 'IBM Echo' --platform=darwin --asar --overwrite --app-category-type=public.app-category.developer-tools --app-bundle-id=echo.ibm.com",
+		"build-client": "rm -rf dist && cd .. && export VITE_APP_IS_ELECTRON_BUILD=true && yarn build:prod && cp -r dist/ server/dist",
+		"dev-server": "env-cmd -f ./.env node --inspect index.cjs",
+		"start": "electron-forge start",
+		"package": "electron-forge package",
+		"make-mac-build": "electron-forge make && cp -r out/make/IBM*.dmg ../public && rm -rf out",
+		"make-windows-build": "electron-forge make --platform=win32 && cp -r out/make/squirrel.windows/x64/IBM*.exe ../public && rm -rf out",
+		"make": "rm -rf ../public/IBM* && export NODE_ENV=production yarn install && yarn build-client && export IS_ELECTRON_BUILD=true && yarn run make-mac-build && yarn run make-windows-build"
+	},
+	"dependencies": {
+		"axios": "^1.4.0",
+		"connect-history-api-fallback": "^2.0.0",
+		"cookie": "0.4.0",
+		"cookie-parser": "^1.4.6",
+		"cors": "^2.8.5",
+		"express": "^4.17.2",
+		"express-session": "^1.17.3",
+		"nanoid": "^4.0.2",
+		"crypto-js": "^4.2.0"
+	},
+	"devDependencies": {
+		"@electron-forge/cli": "^7.2.0",
+		"@electron-forge/maker-deb": "^7.2.0",
+		"@electron-forge/maker-dmg": "^7.2.0",
+		"@electron-forge/maker-rpm": "^7.2.0",
+		"@electron-forge/maker-squirrel": "^7.2.0",
+		"@electron-forge/maker-zip": "^7.2.0",
+		"@electron-forge/plugin-auto-unpack-natives": "^7.2.0",
+		"electron": "^28.1.0",
+		"electron-squirrel-startup": "^1.0.0",
+		"env-cmd": "^10.1.0"
+	},
+	"license": "Apache-2.0"
+}
