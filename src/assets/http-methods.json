@@ -1,0 +1,32 @@
+{
+	"methods": [
+		{
+			"id": "GET",
+			"displayText": "GET"
+		},
+		{
+			"id": "POST",
+			"displayText": "POST"
+		},
+		{
+			"id": "PUT",
+			"displayText": "PUT"
+		},
+		{
+			"id": "PATCH",
+			"displayText": "PATCH"
+		},
+		{
+			"id": "DELETE",
+			"displayText": "DELETE"
+		},
+		{
+			"id": "HEAD",
+			"displayText": "HEAD"
+		},
+		{
+			"id": "OPTIONS",
+			"displayText": "OPTIONS"
+		}
+	]
+}
