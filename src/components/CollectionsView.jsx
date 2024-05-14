@@ -188,7 +188,11 @@ function CollectionsView(props) {
 					id={nodeProps.id}
 					key={nodeProps.id}
 					isExpanded={nodeProps.isExpanded}
-					className={nodeProps.isActive ? "cds--tree-node--active cds--tree-node--selected" : null}
+					className={
+						nodeProps.isActive
+							? `cds--tree-node--active cds--tree-node--selected type-${nodeProps.type}`
+							: `type-${nodeProps.type}`
+					}
 					draggable={true}
 					onDragStart={(evt) => handleDragStart(evt, nodeProps)}
 					onDragEnd={(evt) => handleDragEnd(evt, nodeProps)}

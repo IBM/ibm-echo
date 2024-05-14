@@ -431,6 +431,8 @@ a.cds--header__menu-item {
 		width: 100%;
 		position: sticky;
 		bottom: 20px;
+        bottom: 34px;
+        padding-right: 93px;
 		button {
 			float: right;
 		}
@@ -784,4 +786,8 @@ a.cds--header__menu-item {
 
 .cds--modal-container {
 	width: 45%;
+}
+
+.type-request, .type-chain {
+    padding-inline-start: 1rem !important
 }
