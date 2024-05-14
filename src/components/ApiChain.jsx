@@ -2,14 +2,14 @@
  * Copyright IBM Corp. 2024 - 2024
  * SPDX-License-Identifier: Apache-2.0
  */
-
-import { ExecutableProgram, Json, TrashCan } from "@carbon/react/icons";
+import { ExecutableProgram, Json, Renew, TrashCan, ZoomIn, ZoomOut } from "@carbon/react/icons";
 import {
 	Breadcrumb,
 	BreadcrumbItem,
 	Button,
 	Modal,
 	Tag,
+	CodeSnippet,
 	Tabs,
 	TabList,
 	Tab,
@@ -18,34 +18,18 @@ import {
 	TextArea,
 	InlineLoading,
 	ToastNotification,
+	OverflowMenu,
+	OverflowMenuItem,
 	Dropdown
 } from "@carbon/react";
 import React, { useContext, useEffect, useRef } from "react";
-import GlobalContextProvider, { GlobalStore } from "../contexts/GlobalContext";
+import { GlobalStore } from "../contexts/GlobalContext";
 import Draggable from "react-draggable";
 import { useState } from "react";
 import Xarrow, { useXarrow, Xwrapper } from "react-xarrows";
 import axios from "axios";
 import jsonpath from "jsonpath";
-import TextInput from "react-autocomplete-input";
-
-import Editor, { loader } from "@monaco-editor/react";
-loader.init().then((monaco) => {
-	monaco.editor.defineTheme("default", {
-		base: "vs",
-		inherit: true,
-		rules: [],
-		colors: {
-			"editor.background": "#f4f4f4"
-		}
-	});
-	monaco.editor.setTheme("default");
-});
-
-const items = [
-	{ id: "json", text: "json" },
-	{ id: "urlencoded", text: "x-www-form-urlencoded" }
-];
+import NodeParametersModal from "./NodeParametersModal";
 
 const DraggableApi = ({
 	api,
@@ -87,7 +71,7 @@ const DraggableApi = ({
 
 	return (
 		<Draggable
-			// defaultPosition={{ x: api.posX || 25, y: api.posY || 25 }}
+			//defaultPosition={{ x: api.posX || 25, y: api.posY || 25 }}
 			scale={1}
 			bounds={"#playground"}
 			onStart={handleStartApiDrag}
@@ -102,7 +86,6 @@ const DraggableApi = ({
 			<div
 				className="draggable-api"
 				id={`node-${api.id}`}
-				draggable={true}
 				onDrop={(evt) => onDrop(evt, api)}
 				style={apiStatus}
 			>
@@ -198,7 +181,7 @@ const DraggableApi = ({
 };
 
 function ApiChain(props) {
-	const { updateItemById, updateChainItemById, getById, findAndAddCertsForEndpoint, globalStore } =
+	const { updateItemById, getChainItemById, updateChainItemById, getById, findAndAddCertsForEndpoint, globalStore } =
 		useContext(GlobalStore);
 	const updateXarrow = useXarrow();
 	const currentArrowRef = useRef(null);
@@ -224,8 +207,12 @@ function ApiChain(props) {
 	}, [state.isChainExecuting]);
 
 	const resovler = (obj, val) => {
+		val = val.toString();
 		let tokens = val.split(" ");
 		for (let token of tokens) {
+			if (token.includes("{{") && token.includes("}}")) {
+				token = token.replace(/{{|}}/g, "");
+			}
 			try {
 				let resolvedValue = jsonpath.query(obj, token.trim());
 				if (resolvedValue.length > 0) {
@@ -285,6 +272,7 @@ function ApiChain(props) {
 
 					if (!matched) {
 						/**
+						 *
 						 * In right side values i.e. values provided after colon can
 						 * have resolutions from Last node response
 						 *
@@ -317,38 +305,11 @@ function ApiChain(props) {
 	const executeChain = async () => {
 		let chain = createSequence(props.requestData.chainMap, props.requestData.chain);
 		chain.forEach((api, idx) => {
-			/**
-			 * Resolve {{template}} environment
-			 * variables for endpoint url
-			 */
-			let replacedEndpoint = runReplacements("string", api.endpoint);
-			if (!replacedEndpoint.flag) return;
-			if (replacedEndpoint.flag) {
-				api.endpoint = replacedEndpoint.text;
-			}
-
 			if (idx > 0) {
+				/**
+				 * Resolve {{lastNodeResponse.key}} environment
+				 */
 				let lastNodeResponse = getLastNodeResponse(api.id);
-
-				/**
-				 * Resolve {{template}} environment
-				 * variables for query params
-				 */
-				let replacedQueryParams = runReplacements("object", api.queryParams);
-				if (!replacedQueryParams.flag) return;
-				if (replacedQueryParams.flag) {
-					api.queryParams = replacedQueryParams.text;
-				}
-
-				/**
-				 * Resolve {{template}} environment
-				 * variables for headers
-				 */
-				let replacedHeaders = runReplacements("object", api.headers);
-				if (!replacedHeaders.flag) return;
-				if (replacedHeaders.flag) {
-					api.headers = replacedHeaders.text;
-				}
 
 				// Resolve headers
 				for (const [key, val] of Object.entries(api.headers)) {
@@ -370,6 +331,53 @@ function ApiChain(props) {
 				if (api.reqBodyType === "urlencoded" && typeof api.reqBody === "string") {
 					api.reqBody = resovler(lastNodeResponse, api.reqBody);
 				}
+			}
+
+			/**
+			 * Resolve {{template}} environment
+			 * variables for endpoint url
+			 */
+			let replacedEndpoint = runReplacements("string", api.endpoint);
+			if (!replacedEndpoint.flag) return;
+			if (replacedEndpoint.flag) {
+				api.endpoint = replacedEndpoint.text;
+			}
+
+			/**
+			 * Resolve {{template}} environment
+			 * variables for query params
+			 */
+			let replacedQueryParams = runReplacements("object", api.queryParams || {});
+			if (!replacedQueryParams.flag) return;
+			if (replacedQueryParams.flag) {
+				api.queryParams = replacedQueryParams.text;
+			}
+
+			/**
+			 * Resolve {{template}} environment
+			 * variables for headers
+			 */
+			let replacedHeaders = runReplacements("object", api.headers || {});
+			if (!replacedHeaders.flag) return;
+			if (replacedHeaders.flag) {
+				api.headers = replacedHeaders.text;
+			}
+
+			let type = "object";
+			if (api.reqBodyType !== "urlencoded" && typeof api.reqBody === "object") {
+				type = "object";
+			} else if (api.reqBodyType === "urlencoded" && typeof api.reqBody === "string") {
+				type = "string";
+			}
+
+			/**
+			 * Resolve {{template}} environment
+			 * variables for headers
+			 */
+			let replacedBody = runReplacements(type, api.reqBody || "");
+			if (!replacedBody.flag) return;
+			if (replacedBody.flag) {
+				api.reqBody = replacedBody.text;
 			}
 		});
 
@@ -486,15 +494,6 @@ function ApiChain(props) {
 		return sequence;
 	};
 
-	const getQueryParams = (url) => {
-		const params = {};
-		const urlSearchParams = new URLSearchParams(url.split("?")[1]);
-		for (const [key, value] of urlSearchParams.entries()) {
-			params[key] = value || true;
-		}
-		return params;
-	};
-
 	const handleDrop = (evt) => {
 		evt.stopPropagation();
 		evt.preventDefault();
@@ -514,8 +513,8 @@ function ApiChain(props) {
 							{
 								id: data.id,
 								...data,
-								response: {},
-								queryParams: getQueryParams(data.endpoint)
+								queryParams: convertStringToObj(data.queryParams),
+								response: {}
 							}
 						],
 						chainMap ? [...chainMap] : []
@@ -529,6 +528,9 @@ function ApiChain(props) {
 		evt.stopPropagation();
 		evt.preventDefault();
 		evt.persist();
+		draggingArrowRef.current.style.left = `${evt.clientX}px`;
+		draggingArrowRef.current.style.top = `${evt.clientY}px`;
+		updateXarrow();
 	};
 
 	const handleRequestName = () => {
@@ -588,18 +590,24 @@ function ApiChain(props) {
 			const container = document.querySelector(".playground-wrapper");
 			const element = evt.target;
 
-			// Get the DOMRect for your targeted container
+			// get the domrect for your targeted container
 			const containerDomrect = container.getBoundingClientRect();
 
-			// Get the DOMRect for you element to fetch the x-y coordinates
+			// get the domrect for you relement you wanna have the x/y coordinates
 			const elementDomrect = element.getBoundingClientRect();
 
-			// Then simply subtract the x-y values of the container from the element
+			// then simply subtract the x/y values of the container from the element
 			const xCoord = parseInt(elementDomrect.x - containerDomrect.x);
 			const yCoord = parseInt(elementDomrect.y - containerDomrect.y);
 			updateItemById(api.id, ["posX", "posY"], [xCoord, yCoord]);
 			return;
 		}
+
+		/**
+		 * if from and to nodes are present then only go ahead
+		 */
+		if (!currentArrowRef.current || !api.id) return;
+
 		let arrows = JSON.parse(JSON.stringify(props.requestData.chainMap));
 
 		let isSameArrowPresent = arrows.findIndex(
@@ -615,7 +623,7 @@ function ApiChain(props) {
 			let doublePointers = hasDuplicatePointers(arrows);
 
 			if (isLoop) {
-				alert("Loop detected in chain! This linkage is not possible");
+				alert("Loop detected in chain!, This linkage is not possible");
 				return;
 			}
 
@@ -624,7 +632,7 @@ function ApiChain(props) {
 			}
 
 			if (doublePointers) {
-				alert("A single node cannot be pointed to twice");
+				alert("A single node cannot be pointed twice");
 				return;
 			}
 
@@ -721,10 +729,11 @@ function ApiChain(props) {
 	};
 
 	const handleTextAreaChange = (value, type, selectedApi) => {
+		selectedApi = getChainItemById(props.requestData.id, selectedApi.id);
 		if (type === "headers") {
-			updateChainItemById(props.requestData.id, state.selectedApi.id, type, getHeaderStringToObj(value));
+			updateChainItemById(props.requestData.id, state.selectedApi.id, type, convertStringToObj(value));
 		} else if (type === "queryParams") {
-			updateChainItemById(props.requestData.id, state.selectedApi.id, type, getHeaderStringToObj(value));
+			updateChainItemById(props.requestData.id, state.selectedApi.id, type, convertStringToObj(value));
 		} else if (type === "reqBody" && selectedApi.reqBodyType !== "urlencoded") {
 			updateChainItemById(props.requestData.id, state.selectedApi.id, type, JSON.parse(value));
 		} else if (type === "reqBody" && selectedApi.reqBodyType === "urlencoded") {
@@ -738,8 +747,7 @@ function ApiChain(props) {
 
 	const getDefaultValues = (type) => {
 		if (!state.selectedApi) return "";
-
-		let obj = state.selectedApi;
+		let obj = getChainItemById(props.requestData.id, state.selectedApi.id);
 		let value = "";
 		if (type === "queryParams" && obj.queryParams) {
 			for (const [key, val] of Object.entries(obj.queryParams)) {
@@ -766,7 +774,7 @@ function ApiChain(props) {
 		}
 	};
 
-	const getHeaderStringToObj = (value) => {
+	const convertStringToObj = (value) => {
 		if (!value) return "";
 		if (typeof value === "object" && Object.keys(value).length === 0) return "";
 		if (typeof value === "object" && Object.keys(value).length > 0) return value;
@@ -786,23 +794,6 @@ function ApiChain(props) {
 		}, {});
 
 		return headersObject;
-	};
-
-	const getLastNodeResponse = (id) => {
-		let edge = props.requestData.chainMap.find((arrow) => arrow.to === id);
-		if (edge) {
-			let node = props.requestData.chain.find((node) => node.id === edge.from);
-			let request = getById(node.id);
-
-			if (node.responseData) {
-				return node.responseData;
-			}
-
-			if (request && request.responseData) {
-				return request.responseData;
-			}
-		}
-		return {};
 	};
 
 	const handleExecuteChain = () => {
@@ -867,8 +858,23 @@ function ApiChain(props) {
 		monaco.editor.setTheme("default");
 	};
 
-	let isResponsePresent =
-		state.selectedApi && state.selectedApi?.responseData && Object.keys(state.selectedApi?.responseData).length === 0;
+	const getLastNodeResponse = (id) => {
+		let edge = props.requestData.chainMap.find((arrow) => arrow.to === id);
+		if (edge) {
+			let node = props.requestData.chain.find((node) => node.id === edge.from);
+			let request = getChainItemById(props.requestData.id, node.id);
+
+			if (node.responseData) {
+				return node.responseData;
+			}
+
+			if (request && request.responseData) {
+				return request.responseData;
+			}
+		}
+		return {};
+	};
+
 	return (
 		<div className="apiChain">
 			{state.showToast && (
@@ -886,6 +892,9 @@ function ApiChain(props) {
 			)}
 			<div className="apiChain-title">
 				<Breadcrumb noTrailingSlash>
+					{/* {props.requestData?.breadcrumb.map((crumb) => {
+						return <BreadcrumbItem>{crumb.name}</BreadcrumbItem>;
+					})} */}
 					<BreadcrumbItem href="#">
 						<div
 							className="requestNameText"
@@ -902,7 +911,6 @@ function ApiChain(props) {
 			<div
 				className="apiChain-playground"
 				id="playground"
-				draggable={true}
 				onDrop={handleDrop}
 				onDragOver={handleOnDragOver}
 			>
@@ -936,9 +944,9 @@ function ApiChain(props) {
 						{props.requestData.chainMap?.map((arrow) => (
 							<Xarrow
 								color="#0f62fe"
-								strokeWidth={1.5}
+								strokeWidth={2.0}
 								path="grid"
-								curveness={0.9}
+								curveness={0.7}
 								labels={{
 									middle: arrow.isSelected ? (
 										<div className="arrow-label cds--label">
@@ -949,7 +957,7 @@ function ApiChain(props) {
 												kind="ghost"
 												hasIconOnly
 												iconDescription="Remove this link"
-												renderIcon={() => <TrashCan size="16" />}
+												renderIcon={() => <TrashCan size="20" />}
 											/>
 										</div>
 									) : (
@@ -967,10 +975,11 @@ function ApiChain(props) {
 							<>
 								<Xarrow
 									color="#0f62fe"
-									strokeWidth={2}
+									strokeWidth={2.0}
+									path="grid"
+									curveness={0.7}
 									start={`node-${currentArrowRef.current}`}
 									end={draggingArrowRef}
-									path="grid"
 									tailShape={"circle"}
 								/>
 							</>
@@ -983,6 +992,8 @@ function ApiChain(props) {
 				</div>
 			</div>
 			<div className="apiChain-execution">
+				{/* <Button hasIconOnly renderIcon={() => <ZoomIn size={24} />} iconDescription="Zoom in" kind="ghost"></Button>
+				<Button hasIconOnly renderIcon={() => <ZoomOut size={24} />} iconDescription="Zoom out" kind="ghost"></Button> */}
 				<Button
 					onClick={handleExecuteChain}
 					disabled={state.isChainExecuting}
@@ -992,112 +1003,15 @@ function ApiChain(props) {
 				</Button>
 			</div>
 			{state.isJsonPathModalOpen && (
-				<Modal
-					size="sm"
-					open={state.isJsonPathModalOpen}
-					modalHeading={
-						state.showResponse
-							? `${state.selectedApi.name}: JSON Preview`
-							: `${state.selectedApi.name}: Enter json path to chain`
-					}
-					primaryButtonText="Save"
-					secondaryButtonText="Cancel"
-					onRequestClose={handleCloseJsonPathModal}
-					onRequestSubmit={handleSelectJsonPath}
-				>
-					<div>
-						{state.showResponse && (
-							<Editor
-								height="55vh"
-								options={{ lineNumbers: true, minimap: { enabled: false }, readOnly: true }}
-								defaultLanguage="json"
-								defaultValue={JSON.stringify(state.selectedApi.responseData, null, 3) || ""}
-								onMount={handleEditorDidMount}
-							/>
-						)}
-						{!state.showResponse && (
-							<Tabs>
-								<TabList aria-label="List of tabs">
-									<Tab>Last node response</Tab>
-									<Tab>Query parameters</Tab>
-									<Tab>Headers</Tab>
-									<Tab>Request body</Tab>
-								</TabList>
-								<TabPanels>
-									<TabPanel>
-										{!isResponsePresent && (
-											<Editor
-												height="55vh"
-												options={{ lineNumbers: true, minimap: { enabled: false }, readOnly: true }}
-												defaultLanguage="json"
-												defaultValue={JSON.stringify(getLastNodeResponse(state.selectedApi.id), null, 3) || ""}
-												onMount={handleEditorDidMount}
-											/>
-										)}
-									</TabPanel>
-									<TabPanel className="apiChain-params">
-										<div className="cds--label">Enter overrides here (key: JSON path)</div>
-										<TextInput
-											className="jsonPath-textArea"
-											labelText="Enter overrides here (key: JSON path)"
-											id={`jsonPath-queryParams-${state.selectedApi.id}`}
-											size="lg"
-											onBlur={(evt) => handleTextAreaChange(evt.target.value, "queryParams", state.selectedApi)}
-											defaultValue={getDefaultValues("queryParams")}
-											spacer="}}"
-											placeholder={
-												"If last node response was {'address': {'city': 'NY'}}, then the JSON path of 'city' is \nkey: $.address.city"
-											}
-											trigger={["{{"]}
-											options={generateOptions()}
-										/>
-									</TabPanel>
-									<TabPanel className="apiChain-params">
-										<TextInput
-											className="jsonPath-textArea"
-											labelText="Enter overrides here (key: JSON path)"
-											id={`jsonPath-queryParams-${state.selectedApi.id}`}
-											size="lg"
-											onBlur={(evt) => handleTextAreaChange(evt.target.value, "headers", state.selectedApi)}
-											defaultValue={getDefaultValues("headers")}
-											spacer="}}"
-											placeholder={
-												"If last node response was {'address': {'city': 'NY'}}, then the JSON path of 'city' is \nkey: $.address.city"
-											}
-											trigger={["{{"]}
-											options={generateOptions()}
-											multiline
-											rows={10}
-										/>
-									</TabPanel>
-									<TabPanel>
-										<Dropdown
-											id="default"
-											titleText="Request type"
-											helperText="Please select the request type"
-											initialSelectedItem={items.find((itm) => itm.id === state.selectedApi.reqBodyType)}
-											label="Select an option"
-											items={items}
-											itemToString={(item) => (item ? item.text : "")}
-											onChange={(value) => handleRequestBodyTypeChange(value)}
-										/>
-										<TextArea
-											labelText="Enter overrides here (key: JSON path)"
-											id={`jsonPath-reqBody-${state.selectedApi.id}`}
-											placeholder={
-												"If last node response was {'address': {'city': 'NY'}}, then the JSON path of 'city' is \nkey: $.address.city"
-											}
-											onBlur={(evt) => handleTextAreaChange(evt, "reqBody", state.selectedApi)}
-											defaultValue={`${getDefaultValues("reqBody")}`}
-											multiline
-											rows={10}
-										/>
-									</TabPanel>
-								</TabPanels>
-							</Tabs>
-						)}
-					</div>
-				</Modal>
+				<NodeParametersModal
+					handleSelectJsonPath={handleSelectJsonPath}
+					selectedApi={state.selectedApi}
+					handleCloseJsonPathModal={handleCloseJsonPathModal}
+					requestData={props.requestData}
+					showResponse={state.showResponse}
+					getLastNodeResponse={getLastNodeResponse}
+					convertStringToObj={convertStringToObj}
+				/>
 			)}
 		</div>
 	);
