@@ -22,7 +22,7 @@ import {
 	CopyButton
 } from "@carbon/react";
 import { Send, Close, Copy, Checkmark } from "@carbon/react/icons";
-import { GlobalStore } from "../contexts/GlobalContext";
+import GlobalContextProvider, { GlobalStore } from "../contexts/GlobalContext";
 import httpMethods from "../assets/http-methods.json";
 import axios from "axios";
 import TextInput from "react-autocomplete-input";

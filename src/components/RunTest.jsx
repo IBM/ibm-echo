@@ -33,7 +33,7 @@ import {
 	InlineLoading
 } from "@carbon/react";
 import { Play, Stop } from "@carbon/react/icons";
-import { GlobalStore } from "../contexts/GlobalContext";
+import GlobalContextProvider, { GlobalStore } from "../contexts/GlobalContext";
 import axios from "axios";
 import { CommonUtil } from "./CommonUtil";
 

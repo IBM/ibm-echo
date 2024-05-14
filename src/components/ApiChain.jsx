@@ -21,7 +21,7 @@ import {
 	Dropdown
 } from "@carbon/react";
 import React, { useContext, useEffect, useRef } from "react";
-import { GlobalStore } from "../contexts/GlobalContext";
+import GlobalContextProvider, { GlobalStore } from "../contexts/GlobalContext";
 import Draggable from "react-draggable";
 import { useState } from "react";
 import Xarrow, { useXarrow, Xwrapper } from "react-xarrows";
