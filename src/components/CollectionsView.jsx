@@ -6,7 +6,7 @@
 import { Add, FolderParent, WatsonHealth3DCurveManual, Meter, Share } from "@carbon/react/icons";
 import { Button, OverflowMenu, OverflowMenuItem, TreeNode, TreeView, Tag } from "@carbon/react";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import GlobalContextProvider, { GlobalStore } from "../contexts/GlobalContext";
+import { GlobalStore } from "../contexts/GlobalContext";
 import { Modal, TextInput } from "@carbon/react";
 import { customAlphabet } from "nanoid";
 import ImportCollectionModal from "./ImportCollectionModal";

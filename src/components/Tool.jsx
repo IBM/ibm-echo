@@ -2,7 +2,7 @@ import React from "react";
 import CollectionsView from "./CollectionsView";
 import SettingsView from "./SettingsView";
 import RequestTabs from "./RequestTabs";
-import GlobalContextProvider, { GlobalStore } from "../contexts/GlobalContext";
+import GlobalContextProvider from "../contexts/GlobalContext";
 import Splitter from "./Splitter";
 import { useResizable } from "react-resizable-layout";
 

@@ -6,7 +6,7 @@
 import { FileUploaderDropContainer, FileUploaderItem, Modal, RadioButton, RadioButtonGroup } from "@carbon/react";
 import React, { useState, useContext, useEffect } from "react";
 import { customAlphabet } from "nanoid";
-import GlobalContextProvider, { GlobalStore } from "../contexts/GlobalContext";
+import { GlobalStore } from "../contexts/GlobalContext";
 
 function ImportCollectionModal(props) {
 	const { globalStore, setGlobalStore } = useContext(GlobalStore);

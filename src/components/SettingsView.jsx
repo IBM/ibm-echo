@@ -6,7 +6,7 @@
 import { Settings, TrashCan } from "@carbon/react/icons";
 import { Button, Stack, TabList, TabPanel, TabPanels } from "@carbon/react";
 import React, { useContext, useEffect, useState } from "react";
-import GlobalContextProvider, { GlobalStore } from "../contexts/GlobalContext";
+import { GlobalStore } from "../contexts/GlobalContext";
 import { Modal, Tabs, Tab, TextInput, FileUploader, FormLabel } from "@carbon/react";
 import { customAlphabet } from "nanoid";
 import EnvironmentVarView from "./EnvironmentVarView";

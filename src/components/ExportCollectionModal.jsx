@@ -4,7 +4,7 @@
  */
 
 import React, { useContext, useEffect, useState } from "react";
-import GlobalContextProvider, { GlobalStore } from "../contexts/GlobalContext";
+import { GlobalStore } from "../contexts/GlobalContext";
 import { Checkbox, Modal } from "@carbon/react";
 
 function ExportCollectionModal(props) {

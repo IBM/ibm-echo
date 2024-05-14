@@ -4,7 +4,7 @@
  */
 
 import React, { useContext, useEffect, useRef, useState } from "react";
-import GlobalContextProvider, { GlobalStore } from "../contexts/GlobalContext";
+import { GlobalStore } from "../contexts/GlobalContext";
 import { Button, TextInput } from "@carbon/react";
 import { Add, ArrowRight, Subtract } from "@carbon/react/icons";
 
