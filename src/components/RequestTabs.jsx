@@ -8,7 +8,7 @@ import { OverflowMenu, OverflowMenuItem, Tab, TabList, TabPanel, TabPanels, Tabs
 import React, { useContext, useEffect, useState } from "react";
 import RequestContent from "./RequestContent";
 import RunTest from "./RunTest";
-import { GlobalStore } from "../contexts/GlobalContext";
+import GlobalContextProvider, { GlobalStore } from "../contexts/GlobalContext";
 import { customAlphabet } from "nanoid";
 import ApiChain from "./ApiChain";
 const nanoid = customAlphabet("1234567890abcdef", 10);
