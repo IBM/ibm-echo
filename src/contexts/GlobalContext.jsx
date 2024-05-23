@@ -1,3 +1,8 @@
+/*
+ * Copyright IBM Corp. 2024 - 2024
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { flushSync } from "react-dom";
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
