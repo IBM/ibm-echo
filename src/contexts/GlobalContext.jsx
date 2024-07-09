@@ -154,22 +154,29 @@ export function GlobalContextProvider(props) {
 		}
 	}, [state.certificates]);
 
-	const sendEvents = (TYPE, data, userList) => {
-		axios({
-			method: "post",
-			url: `${serverURL}/events`,
-			headers: { "Content-Type": "application/json" },
-			data: JSON.stringify({
-				json: {
-					TYPE: TYPE,
-					data: data
-				},
-				userList: userList
-			})
-		}).catch((err) => {
-			console.log("sendEvents failed - ", err);
-		});
-	};
+	/**
+	 *
+	 * The below code is kept, just in case
+	 * if required in future to introduce
+	 * feature for peer-to-peer API sharing...
+	 *
+	 */
+	// const sendEvents = (TYPE, data, userList) => {
+	// 	axios({
+	// 		method: "post",
+	// 		url: `${serverURL}/events`,
+	// 		headers: { "Content-Type": "application/json" },
+	// 		data: JSON.stringify({
+	// 			json: {
+	// 				TYPE: TYPE,
+	// 				data: data
+	// 			},
+	// 			userList: userList
+	// 		})
+	// 	}).catch((err) => {
+	// 		console.log("sendEvents failed - ", err);
+	// 	});
+	// };
 
 	const setGlobalStore = (obj) => {
 		setState((prevState) => ({ ...prevState, ...JSON.parse(JSON.stringify(obj)) }));
