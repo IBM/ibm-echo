@@ -590,13 +590,13 @@ function ApiChain(props) {
 			const container = document.querySelector(".playground-wrapper");
 			const element = evt.target;
 
-			// get the domrect for your targeted container
+			// Get the DOMRect for your targeted container
 			const containerDomrect = container.getBoundingClientRect();
 
-			// get the domrect for you relement you wanna have the x/y coordinates
+			// Get the DOMRect for you element to fetch the x-y coordinates
 			const elementDomrect = element.getBoundingClientRect();
 
-			// then simply subtract the x/y values of the container from the element
+			// Then simply subtract the x-y values of the container from the element
 			const xCoord = parseInt(elementDomrect.x - containerDomrect.x);
 			const yCoord = parseInt(elementDomrect.y - containerDomrect.y);
 			updateItemById(api.id, ["posX", "posY"], [xCoord, yCoord]);
@@ -623,7 +623,7 @@ function ApiChain(props) {
 			let doublePointers = hasDuplicatePointers(arrows);
 
 			if (isLoop) {
-				alert("Loop detected in chain!, This linkage is not possible");
+				alert("Loop detected in chain! This linkage is not possible");
 				return;
 			}
 
