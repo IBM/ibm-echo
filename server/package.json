@@ -17,7 +17,7 @@
 		"make": "rm -rf ../public/IBM* && export NODE_ENV=production yarn install && yarn build-client && export IS_ELECTRON_BUILD=true && yarn run make-mac-build && yarn run make-windows-build"
 	},
 	"dependencies": {
-		"axios": "^1.4.0",
+		"axios": "^1.7.4",
 		"connect-history-api-fallback": "^2.0.0",
 		"cookie": "0.4.0",
 		"cookie-parser": "^1.4.6",

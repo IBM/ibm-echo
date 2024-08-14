@@ -22,7 +22,7 @@
 	"dependencies": {
 		"@carbon/react": "^1.52.0",
 		"@monaco-editor/react": "^4.6.0",
-		"axios": "^1.4.0",
+		"axios": "^1.7.4",
 		"carbon-components-react": "^8.37.0",
 		"connect-history-api-fallback": "^2.0.0",
 		"cookie": "0.4.0",
