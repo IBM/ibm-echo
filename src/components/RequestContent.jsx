@@ -21,13 +21,14 @@ import {
 	DangerButton,
 	CopyButton
 } from "@carbon/react";
-import { Send, Close, Copy, Checkmark } from "@carbon/react/icons";
+import { Send, Close } from "@carbon/react/icons";
 import { GlobalStore } from "../contexts/GlobalContext";
 import httpMethods from "../assets/http-methods.json";
 import axios from "axios";
 import TextInput from "react-autocomplete-input";
 import { CommonUtil } from "./CommonUtil";
 import { debounce } from "../hooks/debounce";
+import { AuthFields } from "./AuthFields";
 import Editor, { loader } from "@monaco-editor/react";
 
 loader.init().then((monaco) => {
@@ -59,6 +60,7 @@ function RequestContent(props) {
 	const [requestBodyType, setRequestBodyType] = useState();
 	const [codeSnippetValue, setCodeSnippetValue] = useState();
 	const [codeSnippetType, setCodeSnippetType] = useState({ id: "curl", text: "cURL" });
+	const [authType, setAuthType] = useState({ id: "bearerToken", text: "Bearer Token" });
 	const [notificationState, setNotificationState] = useState({
 		showToast: false,
 		toastMsg: "",
@@ -70,6 +72,7 @@ function RequestContent(props) {
 		{ id: "nodeAxios", text: "NodeJs - Axios", disabled: true },
 		{ id: "jsFetch", text: "JavaScript - Fetch", disabled: true }
 	];
+	const authItems = [{ id: "bearerToken", text: "Bearer Token" }];
 	const items = [
 		{ id: "json", text: "json" },
 		{ id: "urlencoded", text: "x-www-form-urlencoded" }
@@ -506,6 +509,22 @@ function RequestContent(props) {
 		setCodeSnippetType(value.selectedItem);
 	};
 
+	const handleAuthTypeChange = (value) => {
+		setAuthType(value.selectedItem);
+	};
+
+	const handleHeaderChange = (newHeaders) => {
+		setHeaders((prevHeaders) => {
+			const updatedHeaders = { ...prevHeaders, ...newHeaders };
+
+			if (!newHeaders?.Authorization) {
+				delete updatedHeaders.Authorization;
+			}
+
+			return updatedHeaders;
+		});
+	};
+
 	const handleEndpointFocus = (evt) => {
 		console.log("evt.target.scrollWidth > evt.target.clientWidth -- ", evt.target.scrollWidth > evt.target.clientWidth);
 		if (evt.target.scrollWidth > evt.target.clientWidth) {
@@ -617,6 +636,7 @@ function RequestContent(props) {
 					<Tabs>
 						<TabList aria-label="List of tabs">
 							<Tab>Query parameters</Tab>
+							<Tab>Auth</Tab>
 							<Tab>Headers</Tab>
 							<Tab>Request body</Tab>
 							<Tab>Code snippet</Tab>
@@ -635,6 +655,22 @@ function RequestContent(props) {
 									placeholder={"pageSize: 10\npageNumber: 2\n_namedQuery: findById"}
 									trigger={["{{"]}
 									options={globalStore.globalVars.map((variable) => variable.key)}
+								/>
+							</TabPanel>
+							<TabPanel>
+								<Dropdown
+									id="default"
+									titleText="Auth type"
+									selectedItem={authType}
+									label="Select an option"
+									items={authItems}
+									itemToString={(item) => (item ? item.text : "")}
+									onChange={(value) => handleAuthTypeChange(value)}
+								/>
+								<br />
+								<AuthFields
+									authType={authType}
+									onHeaderChange={handleHeaderChange}
 								/>
 							</TabPanel>
 							<TabPanel>
