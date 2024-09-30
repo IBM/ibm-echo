@@ -431,8 +431,8 @@ a.cds--header__menu-item {
 		width: 100%;
 		position: sticky;
 		bottom: 20px;
-        bottom: 34px;
-        padding-right: 93px;
+		bottom: 34px;
+		padding-right: 93px;
 		button {
 			float: right;
 		}
@@ -788,6 +788,24 @@ a.cds--header__menu-item {
 	width: 45%;
 }
 
-.type-request, .type-chain {
-    padding-inline-start: 1rem !important
+.type-request,
+.type-chain {
+	padding-inline-start: 1rem !important;
+}
+
+.node-parameters-modal {
+	background-color: white !important;
+	height: 40px !important;
+	padding-left: 16px !important;
+	padding-top: 10px !important;
+	font-size: 0.8rem !important;
+
+	&:focus-visible {
+		height: 40px !important;
+	}
+}
+
+.node-parameters-inputText > .react-autocomplete-input {
+	margin-left: -39%;
+	margin-top: -8%;
 }
