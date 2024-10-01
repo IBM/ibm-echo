@@ -3,11 +3,17 @@ import PropTypes from "prop-types";
 import PureTextInput from "./PureTextInput";
 
 export const AuthFields = ({ authType, onHeaderChange }) => {
+	const [userName, setUserName] = useState("");
+	const [password, setPassword] = useState("");
 	const [token, setToken] = useState("");
 
 	const updateAuthorizationHeader = () => {
 		let authorizationHeader = "";
-		if (token) {
+		if (userName && password) {
+			// Encode the username and password in base64 to create an Authorization header
+			const base64Credentials = btoa(`${userName}:${password}`);
+			authorizationHeader = `Basic ${base64Credentials}`;
+		} else if (token) {
 			authorizationHeader = `Bearer ${token}`;
 		}
 		onHeaderChange(authorizationHeader ? { Authorization: authorizationHeader } : {});
@@ -15,10 +21,37 @@ export const AuthFields = ({ authType, onHeaderChange }) => {
 
 	useEffect(() => {
 		updateAuthorizationHeader();
-	}, [token]);
+	}, [userName, password, token]);
 
 	return (
 		<>
+			{authType.id === "basic" && (
+				<div className="node-parameters-inputText">
+					<div className="cds--label">Username</div>
+					<PureTextInput
+						className="cds--text-input node-parameters-modal"
+						domId="username"
+						changeHandler={(id, type, value) => setUserName(value)}
+						type="text"
+						id="username"
+						placeholder="Enter Username"
+						defaultValue={userName}
+					/>
+					<br />
+					<br />
+					<div className="cds--label">Password</div>
+					<PureTextInput
+						className="cds--text-input node-parameters-modal"
+						domId="password"
+						changeHandler={(id, type, value) => setPassword(value)}
+						type="text"
+						id="password"
+						placeholder="Enter Password"
+						defaultValue={password}
+					/>
+				</div>
+			)}
+
 			{authType.id === "bearerToken" && (
 				<div className="node-parameters-inputText">
 					<div className="cds--label">Token</div>
@@ -29,6 +62,7 @@ export const AuthFields = ({ authType, onHeaderChange }) => {
 						type="text"
 						id="token"
 						placeholder="Enter Bearer Token"
+						defaultValue={token}
 					/>
 				</div>
 			)}
