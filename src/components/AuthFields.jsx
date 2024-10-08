@@ -3,15 +3,15 @@ import PropTypes from "prop-types";
 import PureTextInput from "./PureTextInput";
 
 export const AuthFields = ({ authType, onHeaderChange }) => {
-	const [userName, setUserName] = useState("");
+	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [token, setToken] = useState("");
 
 	const updateAuthorizationHeader = () => {
 		let authorizationHeader = "";
-		if (userName && password) {
+		if (username && password) {
 			// Encode the username and password in base64 to create an Authorization header
-			const base64Credentials = btoa(`${userName}:${password}`);
+			const base64Credentials = btoa(`${username}:${password}`);
 			authorizationHeader = `Basic ${base64Credentials}`;
 		} else if (token) {
 			authorizationHeader = `Bearer ${token}`;
@@ -21,7 +21,7 @@ export const AuthFields = ({ authType, onHeaderChange }) => {
 
 	useEffect(() => {
 		updateAuthorizationHeader();
-	}, [userName, password, token]);
+	}, [username, password, token]);
 
 	return (
 		<>
@@ -31,11 +31,11 @@ export const AuthFields = ({ authType, onHeaderChange }) => {
 					<PureTextInput
 						className="cds--text-input node-parameters-modal"
 						domId="username"
-						changeHandler={(id, type, value) => setUserName(value)}
+						changeHandler={(id, type, value) => setUsername(value)}
 						type="text"
 						id="username"
 						placeholder="Enter Username"
-						defaultValue={userName}
+						defaultValue={username}
 					/>
 					<br />
 					<br />
