@@ -13,8 +13,8 @@ IBM ECHO is a API Requestor which refers to a component or entity within a softw
 - [x]  Echo can be run on your favourite browser or on your personal computer as a desktop app.
 - [x]  Unlike other REST API clients in the market, Echo desktop app works just as great in offline mode, too!
 - [x]  Authentication Methods:
-   - **Basic Authentication**: Sends the username and password encoded in Base64 within the request header.
-   - **Bearer Token Authentication**: Utilizes a token issued by the server, passed in the authorization header, providing more secure and scalable authentication.
+    - **Basic Authentication**: Sends the username and password encoded in Base64 within the request header.
+    - **Bearer Token Authentication**: Utilizes a token issued by the server, passed in the authorization header, providing more secure and scalable authentication.
 
 ## How it works
 - There are two parts to the application - Backend & Frontend.
