@@ -23,6 +23,16 @@ export const AuthFields = ({ authType, onHeaderChange }) => {
 		updateAuthorizationHeader();
 	}, [username, password, token]);
 
+	// Reset fields based on authType change
+	useEffect(() => {
+		if (authType.id === "basic") {
+			setToken("");
+		} else if (authType.id === "bearerToken") {
+			setUsername("");
+			setPassword("");
+		}
+	}, [authType]);
+
 	return (
 		<>
 			{authType.id === "basic" && (
