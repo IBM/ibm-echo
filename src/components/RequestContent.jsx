@@ -60,7 +60,7 @@ function RequestContent(props) {
 	const [requestBodyType, setRequestBodyType] = useState();
 	const [codeSnippetValue, setCodeSnippetValue] = useState();
 	const [codeSnippetType, setCodeSnippetType] = useState({ id: "curl", text: "cURL" });
-	const [authType, setAuthType] = useState({ id: "bearerToken", text: "Bearer Token" });
+	const [authType, setAuthType] = useState({ id: "basic", text: "Basic" });
 	const [notificationState, setNotificationState] = useState({
 		showToast: false,
 		toastMsg: "",
@@ -72,7 +72,10 @@ function RequestContent(props) {
 		{ id: "nodeAxios", text: "NodeJs - Axios", disabled: true },
 		{ id: "jsFetch", text: "JavaScript - Fetch", disabled: true }
 	];
-	const authItems = [{ id: "bearerToken", text: "Bearer Token" }];
+	const authItems = [
+		{ id: "basic", text: "Basic" },
+		{ id: "bearerToken", text: "Bearer Token" }
+	];
 	const items = [
 		{ id: "json", text: "json" },
 		{ id: "urlencoded", text: "x-www-form-urlencoded" }
@@ -302,7 +305,11 @@ function RequestContent(props) {
 			return acc;
 		}, {});
 
-		setHeaders(headersObject);
+
+		setHeaders((prevHeaders) => ({
+			...prevHeaders,
+			...headersObject
+		}));
 	};
 
 	useEffect(() => {
