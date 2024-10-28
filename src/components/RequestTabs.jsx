@@ -143,7 +143,7 @@ function RequestTabs(props) {
 					description: "",
 					headers: {},
 					reqBody: "",
-					reqBodyType: "json",
+					reqBodyType: "none",
 					queryParams: {},
 					response: {},
 					isTabOpen: true,
