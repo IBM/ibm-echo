@@ -77,12 +77,14 @@ function RequestContent(props) {
 		{ id: "bearerToken", text: "Bearer Token" }
 	];
 	const items = [
+		{ id: "none", text: "none" },
 		{ id: "json", text: "json" },
 		{ id: "urlencoded", text: "x-www-form-urlencoded" }
 	];
 	const reqBodyTypeMap = {
-		json: 0,
-		urlencoded: 1
+		none: 0,
+		json: 1,
+		urlencoded: 2
 	};
 
 	const debounceHook = debounce(headers, 500);
@@ -543,6 +545,40 @@ function RequestContent(props) {
 		monaco.editor.setTheme("default");
 	};
 
+	const renderRequestBodyType = () => {
+		switch(requestBodyType?.id) {
+			case "none":
+				return null;
+			default:
+				return (
+					<>
+						<TextInput
+							id="requestBody"
+							labelText="Request Body"
+							size="lg"
+							onChange={(e) => handleRequestBodyChange(e, true)}
+							value={requestBody}
+							onBlur={updateRequestBody}
+							spacer="}}"
+							rows={10}
+							placeholder={`Provide the request body to be sent`}
+							style={{
+								height: "unset",
+								outline: invalidRequestBody ? "2px solid var(--cds-support-error, #da1e28)" : null,
+								borderBottom: invalidRequestBody ? "unset" : null
+							}}
+							trigger={["{{"]}
+							isRequestBodyValid
+							options={globalStore.globalVars.map((variable) => variable.key)}
+						/>
+						{invalidRequestBody && (
+							<div className="requestBodyErrorMessage">{`Invalid data format. Please check your input.`}</div>
+						)}
+					</>
+				);
+		}
+	};
+
 	return (
 		<div>
 			{notificationState.showToast && (
@@ -708,28 +744,9 @@ function RequestContent(props) {
 									onChange={(value) => handleRequestBodyTypeChange(value)}
 								/>
 								<br />
-								<TextInput
-									id="requestBody"
-									labelText="Request Body"
-									size="lg"
-									onChange={(e) => handleRequestBodyChange(e, true)}
-									value={requestBody}
-									onBlur={updateRequestBody}
-									spacer="}}"
-									rows={10}
-									placeholder={`Provide the request body to be sent`}
-									style={{
-										height: "unset",
-										outline: invalidRequestBody ? "2px solid var(--cds-support-error, #da1e28)" : null,
-										borderBottom: invalidRequestBody ? "unset" : null
-									}}
-									trigger={["{{"]}
-									isRequestBodyValid
-									options={globalStore.globalVars.map((variable) => variable.key)}
-								/>
-								{invalidRequestBody && (
-									<div className="requestBodyErrorMessage">{`Invalid data format. Please check your input.`}</div>
-								)}
+								{
+									renderRequestBodyType()
+								}
 							</TabPanel>
 							<TabPanel>
 								<Dropdown
