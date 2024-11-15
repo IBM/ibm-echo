@@ -82,7 +82,7 @@ expressApp.post("/proxy", async (req, res) => {
 				break;
 			}
 			default:
-				requestBody = null;
+				// No specific action for other types
 				break;
 		}
 	}
