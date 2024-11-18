@@ -64,19 +64,26 @@ expressApp.get("/sanity", async (req, res) => {
 expressApp.post("/proxy", async (req, res) => {
 	let requestBody = undefined;
 	if (req.body.reqBody && Object.keys(req.body.reqBody).length > 0) {
-		requestBody = req.body.reqBody;
-		if (typeof data === "object" && Object.keys(data).length > 0) {
-			requestBody = req.body.reqBody;
-		} else if (req.body.reqBodyType && req.body.reqBodyType === "urlencoded") {
-			const lines = req.body.reqBody.split("\n");
-			const data = new URLSearchParams();
-			lines.forEach((line) => {
-				const [key, value] = line.split(":");
-				if (key && value) {
-					data.append(key.trim(), value.trim());
-				}
-			});
-			requestBody = data.toString();
+		switch (req.body.reqBody) {
+			case "json": {
+				requestBody = req.body.reqBody;
+				break;
+			}
+			case "urlencoded": {
+				const lines = req.body.reqBody.split("\n");
+				const data = new URLSearchParams();
+				lines.forEach((line) => {
+					const [key, value] = line.split(":");
+					if (key && value) {
+						data.append(key.trim(), value.trim());
+					}
+				});
+				requestBody = data.toString();
+				break;
+			}
+			default:
+				// No specific action for other types
+				break;
 		}
 	}
 

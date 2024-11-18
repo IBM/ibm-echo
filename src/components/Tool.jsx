@@ -345,7 +345,7 @@ function Tool() {
 								description: "",
 								headers: {},
 								reqBody: "",
-								reqBodyType: "json",
+								reqBodyType: "none",
 								queryParams: {},
 								response: {},
 								isTabOpen: true,
