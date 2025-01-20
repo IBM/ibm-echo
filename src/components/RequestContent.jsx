@@ -468,7 +468,7 @@ function RequestContent(props) {
 					}
 
 					saveApiResponse(
-						error.response.data,
+						error.response.data.data,
 						error.response.statusText,
 						error.response.status,
 						executionTime,
