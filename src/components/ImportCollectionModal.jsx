@@ -154,7 +154,13 @@ function ImportCollectionModal(props) {
 
 		if (item.body) {
 			reqBody = item.body.text;
-			reqBodyType = item.body.mimeType === "application/json" ? "json" : "urlencoded";
+			if (item.body.mimeType === "application/json") {
+				reqBodyType = "json";
+			} else if (item.body.mimeType === "application/xml") {
+				reqBodyType = "xml";
+			} else {
+				reqBodyType = "urlencoded";
+			}
 		}
 		if (item.parameters && item.parameters.length > 0) {
 			item.parameters.forEach((q) => {
@@ -271,8 +277,13 @@ function ImportCollectionModal(props) {
 
 						try {
 							if (item?.request?.body?.raw) {
-								reqBody = JSON.parse(item?.request?.body?.raw);
-								reqBodyType = "json";
+								if (item?.request?.body?.options?.raw?.language === "xml" || item?.request?.reqBodyType	=== "xml") {
+									reqBody = item?.request?.body?.raw
+									reqBodyType = "xml";
+								} else {
+									reqBody = JSON.parse(item?.request?.body?.raw);
+								}
+									reqBodyType = "json";
 							} else if (item?.request?.body?.mode === "urlencoded") {
 								const urlencoded = item.request.body.urlencoded || [];
 								reqBody = urlencoded.map((param) => `${param.key}:${param.value}`).join("\n");

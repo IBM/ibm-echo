@@ -79,12 +79,14 @@ function RequestContent(props) {
 	const items = [
 		{ id: "none", text: "none" },
 		{ id: "json", text: "json" },
+		{ id: "xml", text: "xml" },
 		{ id: "urlencoded", text: "x-www-form-urlencoded" }
 	];
 	const reqBodyTypeMap = {
 		none: 0,
 		json: 1,
-		urlencoded: 2
+		xml: 2,
+		urlencoded: 3
 	};
 
 	const debounceHook = debounce(headers, 500);
@@ -117,11 +119,18 @@ function RequestContent(props) {
 
 		setEndpoint(data.endpoint || "");
 		if (data.reqBody) {
-			setRequestBody(JSON.stringify(data.reqBody, null, 2));
-			if (data.reqBodyType === "json") {
-				setRequestBody(JSON.stringify(data.reqBody, null, 2));
-			} else if (data.reqBodyType === "urlencoded") {
-				setRequestBody(data.reqBody);
+			switch (data.reqBodyType) {
+ 				case "json":
+ 					setRequestBody(JSON.stringify(data.reqBody, null, 2));
+ 					break;
+ 				case "urlencoded":
+ 					setRequestBody(data.reqBody);
+ 				case "xml":
+ 					setRequestBody(data.reqBody);
+					 break;
+				default:
+					setRequestBody("");
+					break;
 			}
 		} else {
 			setRequestBody("");
@@ -184,6 +193,13 @@ function RequestContent(props) {
 				reqData = replacedReqBody.text;
 			}
 			curlCommand += ` --data-urlencode '${reqData}'`;
+		} else if (requestBodyType?.id === "xml" && requestBody) {
+			let reqData = requestBody;
+			let replacedReqBody = CommonUtil.runReplacements(requestBody, "requestBodyString", globalStore);
+			if (replacedReqBody.flag) {
+				reqData = replacedReqBody.text;
+			}
+			curlCommand += ` --data-raw '${reqData}'`;
 		}
 
 		return curlCommand;
@@ -264,11 +280,11 @@ function RequestContent(props) {
 	const updateRequestBody = (inputType) => {
 		try {
 			var type = inputType;
-			if (inputType !== "urlencoded" && inputType !== "json") {
+			if (inputType !== "urlencoded" && inputType !== "json" && inputType !== "xml") {
 				type = requestBodyType?.id;
 			}
 			var parsedRequestBody = "";
-			if (type === "urlencoded") {
+			if (type === "urlencoded" || type === "xml") {
 				parsedRequestBody = requestBody;
 				setRequestBody(requestBody.toString());
 			} else if (type === "json" && requestBody !== "{}" && requestBody !== "" && requestBody !== undefined) {
@@ -395,7 +411,7 @@ function RequestContent(props) {
 
 		let replacedReqBody = CommonUtil.runReplacements(
 			props.requestData.reqBody,
-			requestBodyType?.id == "urlencoded" ? "requestBodyString" : "requestBodyObj",
+			requestBodyType?.id === "urlencoded" || requestBodyType?.id === "xml" ? "requestBodyString" : "requestBodyObj",
 			globalStore
 		);
 		if (replacedReqBody.flag) {
