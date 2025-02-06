@@ -282,8 +282,8 @@ function ImportCollectionModal(props) {
 									reqBodyType = "xml";
 								} else {
 									reqBody = JSON.parse(item?.request?.body?.raw);
-								}
 									reqBodyType = "json";
+								}
 							} else if (item?.request?.body?.mode === "urlencoded") {
 								const urlencoded = item.request.body.urlencoded || [];
 								reqBody = urlencoded.map((param) => `${param.key}:${param.value}`).join("\n");
