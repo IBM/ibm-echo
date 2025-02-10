@@ -81,6 +81,16 @@ expressApp.post("/proxy", async (req, res) => {
 				requestBody = data.toString();
 				break;
 			}
+			case "xml": {
+				// Ensure Content-Type is set to application/xml
+				if (!req.body.headers) {
+					req.body.headers = {};
+				}
+				if (!req.body.headers['Content-Type']) {
+					req.body.headers['Content-Type'] = 'application/xml';
+				}
+				break;
+			}
 			default:
 				// No specific action for other types
 				break;
@@ -124,6 +134,7 @@ expressApp.post("/proxy", async (req, res) => {
 				// `error.request` is an instance of XMLHttpRequest in the browser
 				// and an instance of http.ClientRequest in node.js
 				console.log("error.request - ", error.request);
+				console.log("error message - ", error.message);
 				res.status(500).send({
 					message: "Failed: " + error.message
 				});

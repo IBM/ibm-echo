@@ -4,6 +4,7 @@ IBM ECHO is a API Requestor which refers to a component or entity within a softw
 
 ## Features
 - [x]  Testing API endpoint with all methods - GET, PUT, POST, DELETE, etc.
+- [x]  Request body supports json, xml and multipart file upload payloads.
 - [x]  Displays API response time along with response byte size and response headers.
 - [x]  Save APIs at collections, sub-group level.
 - [x]  Import collections from Postman and Insomnia.

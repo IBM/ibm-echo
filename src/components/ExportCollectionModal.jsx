@@ -54,6 +54,7 @@ function ExportCollectionModal(props) {
 						request: {
 							method: it.method,
 							header: getHeaders(it.headers),
+							reqBodyType: it.reqBodyType,
 							body: it.reqBody
 								? {
 										raw: it.reqBody

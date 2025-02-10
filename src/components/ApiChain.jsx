@@ -370,6 +370,9 @@ function ApiChain(props) {
 				if (api.reqBodyType === "urlencoded" && typeof api.reqBody === "string") {
 					api.reqBody = resovler(lastNodeResponse, api.reqBody);
 				}
+				if (api.reqBodyType === "xml" && typeof api.reqBody === "string") {
+					api.reqBody = resovler(lastNodeResponse, api.reqBody);
+				}
 			}
 		});
 
