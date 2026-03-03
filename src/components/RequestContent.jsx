@@ -185,7 +185,7 @@ function RequestContent(props) {
 			if (replacedReqBody.flag) {
 				reqData = replacedReqBody.text;
 			}
-			curlCommand += ` --data '${JSON.stringify(reqData)}'`;
+			curlCommand += ` --header 'Content-Type: application/json' --data '${JSON.stringify(reqData)}'`;
 		} else if (requestBodyType?.id === "urlencoded" && requestBody) {
 			let reqData = requestBody;
 			let replacedReqBody = CommonUtil.runReplacements(requestBody, "requestBodyString", globalStore);
@@ -199,7 +199,7 @@ function RequestContent(props) {
 			if (replacedReqBody.flag) {
 				reqData = replacedReqBody.text;
 			}
-			curlCommand += ` --data-raw '${reqData}'`;
+			curlCommand += ` --header 'Content-Type: application/xml' --data-raw '${reqData}'`;
 		}
 
 		return curlCommand;
