@@ -192,14 +192,14 @@ function RequestContent(props) {
 			if (replacedReqBody.flag) {
 				reqData = replacedReqBody.text;
 			}
-			curlCommand += ` --header 'Content-Type: application/xml' --data-raw '${reqData}'`;
+			curlCommand += ` --data-urlencode '${reqData}'`;
 		} else if (requestBodyType?.id === "xml" && requestBody) {
 			let reqData = requestBody;
 			let replacedReqBody = CommonUtil.runReplacements(requestBody, "requestBodyString", globalStore);
 			if (replacedReqBody.flag) {
 				reqData = replacedReqBody.text;
 			}
-			curlCommand += ` --data-raw '${reqData}'`;
+			curlCommand += ` --header 'Content-Type: application/xml' --data-raw '${reqData}'`;
 		}
 
 		return curlCommand;
