@@ -122,7 +122,7 @@ function CollectionsView(props) {
 		evt.dataTransfer.setData("json", JSON.stringify(elem));
 
 		let p = document.createElement("p");
-		p.innerHTML = elem.name;
+		p.textContent = elem.name;
 		p.classList.add("draggedItem");
 		document.querySelector(".hiddenDiv").appendChild(p);
 		evt.dataTransfer.setDragImage(p, 0, 0);

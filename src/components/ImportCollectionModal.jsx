@@ -8,6 +8,8 @@ import React, { useState, useContext, useEffect } from "react";
 import { customAlphabet } from "nanoid";
 import { GlobalStore } from "../contexts/GlobalContext";
 
+const sanitizeName = (raw) => (typeof raw === "string" ? raw : String(raw ?? "")).slice(0, 512);
+
 function ImportCollectionModal(props) {
 	const { globalStore, setGlobalStore } = useContext(GlobalStore);
 	const [file, setFile] = useState({ file: null, isFileSelected: false, fileErrorMessage: null });
@@ -191,7 +193,7 @@ function ImportCollectionModal(props) {
 			type: "request",
 			method: item.method || "GET",
 			endpoint: endpoint,
-			name: item.name,
+			name: sanitizeName(item.name),
 			description: "",
 			headers: headerObj,
 			reqBody: reqBody || "",
@@ -306,7 +308,7 @@ function ImportCollectionModal(props) {
 							type: "request",
 							method: item?.request?.method || "GET",
 							endpoint: item?.request?.url?.["raw"] || "",
-							name: item["name"],
+							name: sanitizeName(item["name"]),
 							description: "",
 							headers: headerObj,
 							reqBody: reqBody || "",
