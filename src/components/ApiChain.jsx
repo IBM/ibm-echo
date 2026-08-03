@@ -26,7 +26,7 @@ import Draggable from "react-draggable";
 import { useState } from "react";
 import Xarrow, { useXarrow, Xwrapper } from "react-xarrows";
 import axios from "axios";
-import jsonpath from "jsonpath";
+import { JSONPath } from "jsonpath-plus";
 import TextInput from "react-autocomplete-input";
 
 import Editor, { loader } from "@monaco-editor/react";
@@ -227,7 +227,7 @@ function ApiChain(props) {
 		let tokens = val.split(" ");
 		for (let token of tokens) {
 			try {
-				let resolvedValue = jsonpath.query(obj, token.trim());
+				let resolvedValue = JSONPath({ path: token.trim(), json: obj });
 				if (resolvedValue.length > 0) {
 					val = val.replace(token.trim(), resolvedValue[0]);
 				}
