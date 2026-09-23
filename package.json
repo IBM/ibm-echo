@@ -38,8 +38,8 @@
 		"react-dom": "^18.2.0",
 		"react-draggable": "^4.4.6",
 		"react-resizable-layout": "^0.7.0",
-		"react-router": "^6.30.4",
-		"react-router-dom": "^6.30.4",
+		"react-router": "^6.30.6",
+		"react-router-dom": "^6.30.6",
 		"react-xarrows": "^2.0.2"
 	},
 	"devDependencies": {
@@ -65,9 +65,11 @@
 		"brace-expansion": "^1.1.18",
 		"braces": "^3.0.3",
 		"cross-spawn": "^7.0.6",
-		"js-yaml": "^4.3.1",
+		"js-yaml": "^4.3.2",
 		"path-to-regexp": "^0.1.13",
-		"rollup": "^3.30.0"
+		"rollup": "^3.30.0",
+		"nanoid": "^3.3.12",
+		"qs": "^6.16.0"
 	},
 	"license": "Apache-2.0"
 }
