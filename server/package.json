@@ -48,7 +48,8 @@
 		"braces": "^3.0.3",
 		"cross-spawn": "^7.0.6",
 		"tmp": "^0.2.7",
-		"qs": "^6.16.0"
+		"qs": "^6.16.0",
+		"extract-zip": "npm:@electron-internal/extract-zip@^1.0.5"
 	},
 	"license": "Apache-2.0"
 }
