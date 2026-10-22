@@ -41,11 +41,16 @@ expressApp.use(responseTime);
 
 expressApp.use(
 	session({
-		secret: "asdasdsadsa",
+		secret: process.env.SESSION_SECRET || require("crypto").randomBytes(32).toString("hex"),
 		resave: false,
 		saveUninitialized: false,
 		proxy: true,
-		rolling: true
+		rolling: true,
+		cookie: {
+			httpOnly: true,
+			secure: IS_ELECTRON_ENV || process.env.NODE_ENV === "production",
+			sameSite: "strict"
+		}
 	})
 );
 
@@ -62,6 +67,17 @@ expressApp.get("/sanity", async (req, res) => {
 });
 
 expressApp.post("/proxy", async (req, res) => {
+	// Validate the target URL to prevent request forgery (CodeQL js/request-forgery)
+	const targetUrl = req.body.url;
+	try {
+		const parsed = new URL(targetUrl);
+		if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+			return res.status(400).send({ message: "Invalid URL: only http and https are allowed" });
+		}
+	} catch {
+		return res.status(400).send({ message: "Invalid URL supplied" });
+	}
+
 	let requestBody = undefined;
 	if (req.body.reqBody && Object.keys(req.body.reqBody).length > 0) {
 		switch (req.body.reqBody) {

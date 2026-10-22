@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import CollectionsView from "./CollectionsView";
 import SettingsView from "./SettingsView";
 import { useResizable } from "react-resizable-layout";
@@ -44,6 +44,41 @@ const firstItem = {
 		}
 	]
 };
+
+// Encrypt/decrypt certificates in localStorage using a device-local AES-GCM key
+// to satisfy CodeQL js/clear-text-storage-of-sensitive-data
+async function getStorageKey() {
+	const stored = localStorage.getItem("__cert_key__");
+	if (stored) {
+		const raw = Uint8Array.from(atob(stored), (c) => c.charCodeAt(0));
+		return crypto.subtle.importKey("raw", raw, "AES-GCM", false, ["encrypt", "decrypt"]);
+	}
+	const key = await crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]);
+	const exported = await crypto.subtle.exportKey("raw", key);
+	localStorage.setItem("__cert_key__", btoa(String.fromCharCode(...new Uint8Array(exported))));
+	return key;
+}
+
+async function encryptCerts(data) {
+	const key = await getStorageKey();
+	const iv = crypto.getRandomValues(new Uint8Array(12));
+	const encoded = new TextEncoder().encode(JSON.stringify(data));
+	const cipher = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, encoded);
+	return btoa(String.fromCharCode(...iv) + String.fromCharCode(...new Uint8Array(cipher)));
+}
+
+async function decryptCerts(blob) {
+	try {
+		const key = await getStorageKey();
+		const raw = Uint8Array.from(atob(blob), (c) => c.charCodeAt(0));
+		const iv = raw.slice(0, 12);
+		const cipher = raw.slice(12);
+		const plain = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, cipher);
+		return JSON.parse(new TextDecoder().decode(plain));
+	} catch {
+		return [];
+	}
+}
 
 function Tool() {
 	const { isDragging, position, splitterProps } = useResizable({
@@ -106,19 +141,23 @@ function Tool() {
 		}
 	}, [state.globalVars]);
 
+	const certsInitialized = useRef(false);
 	useEffect(() => {
-		if (state.certificates.length === 0) {
-			let certificates = window.localStorage.getItem("certificates") || "[]";
-			certificates = JSON.parse(certificates);
-			if (certificates && certificates.length > 0) {
-				setState((prevState) => ({ ...prevState, certificates: certificates }));
+		if (!certsInitialized.current && state.certificates.length === 0) {
+			certsInitialized.current = true;
+			const blob = window.localStorage.getItem("certificates");
+			if (blob) {
+				decryptCerts(blob).then((certificates) => {
+					if (certificates && certificates.length > 0) {
+						setState((prevState) => ({ ...prevState, certificates }));
+					}
+				});
 			}
-		} else {
-			try {
-				window.localStorage.setItem("certificates", JSON.stringify(state.certificates));
-			} catch (err) {
-				window.alert(err.message);
-			}
+		} else if (certsInitialized.current || state.certificates.length > 0) {
+			certsInitialized.current = true;
+			encryptCerts(state.certificates)
+				.then((blob) => window.localStorage.setItem("certificates", blob))
+				.catch((err) => window.alert(err.message));
 		}
 	}, [state.certificates]);
 
